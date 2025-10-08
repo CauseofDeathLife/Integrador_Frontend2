@@ -1,0 +1,39 @@
+
+# === Node / Vite React (asistencia-dashboard) ===
+node_modules/
+dist/
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Env (si en el futuro agregas variables)
+.env
+.env.local
+.env.*.local
+
+# Editores / SO
+.DS_Store
+.vscode/
+.idea/
+*.iml
+
+# Caches / cobertura (por si luego agregas tests)
+.cache/
+.parcel-cache/
+coverage/
+.nyc_output/
+
+# Snapshots de tests (si usas testing)
+**/__snapshots__/
+
+# Windows / varios
+Thumbs.db
+ehthumbs.db
+# Plantillas y vendors originales (no usados por el build de React)
+dashboard-universidad/
+plantilla-universidad/
+vendor/

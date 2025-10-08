@@ -1,0 +1,183 @@
+/* Tema: plantilla-universidad para Asistencia Dashboard*/
+
+/* ===================== 1) Paleta y variables ===================== */
+:root {
+  /* Marca (morado) tomada de la plantilla */
+  --primary-500: #582c83; /* base */
+  --primary-600: #59388e; /* hover claro */
+  --primary-700: #45206a; /* hover/active oscuro */
+  --primary-rgb: 88, 44, 131;
+
+  /* Neutrales y fondos */
+  --text: #333333;
+  --surface: #ffffff;
+  --surface-muted: #f8f9fb;
+  --border: #e9ecef;
+  --muted: #9aa1a9;
+  --dark: #2d2d2d;
+  --black: #111111;
+
+  /* Override de variables Bootstrap (si tu versión las respeta) */
+  --bs-primary: var(--primary-500);
+  --bs-primary-rgb: var(--primary-rgb);
+  --bs-link-color: var(--primary-500);
+  --bs-link-hover-color: var(--primary-700);
+}
+
+html, body, #root { height: 100%; }
+
+/* ===================== 2) Tipografía global ===================== */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--surface);
+}
+
+h1, h2, h3, h4, h5, h6 { font-weight: 700; color: var(--text); }
+h1 { letter-spacing: .2px; }
+
+/* ===================== 3) Topbar (como en plantilla: oscuro) ===================== */
+.topbar {
+  background: var(--dark) !important;
+  color: #fff !important;
+  border-bottom: 1px solid #222; /* fino para contraste en dark */
+}
+.topbar a,
+.topbar .nav-link {
+  color: #fff !important;
+  opacity: .95;
+  text-decoration: none;
+}
+.topbar a:hover,
+.topbar .nav-link:hover { opacity: 1; color: #fff !important; }
+
+/* ===================== 4) Sidebar ===================== */
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: var(--surface-muted);
+  border-right: 1px solid var(--border);
+}
+.sidebar .nav-link { color: var(--text); }
+.sidebar .nav-link:hover {
+  background: rgba(var(--primary-rgb), .06);
+  color: var(--primary-500);
+  border-radius: .5rem;
+}
+.sidebar .nav-link.active {
+  background: rgba(var(--primary-rgb), .10);
+  color: var(--primary-500);
+  border-radius: .5rem;
+}
+.sidebar .nav-link.disabled { color: var(--muted); }
+
+/* ===================== 5) Enlaces y navegación ===================== */
+a,
+.nav-link,
+.page-link {
+  color: var(--primary-500) !important;
+}
+a:hover,
+.nav-link:hover,
+.page-link:hover {
+  color: var(--primary-700) !important;
+}
+
+/* ===================== 6) Botones (sólido y contorneado) ===================== */
+.btn-primary,
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--primary-500) !important;
+  border-color: var(--primary-500) !important;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:active:focus {
+  background-color: var(--primary-700) !important;
+  border-color: var(--primary-700) !important;
+}
+
+.btn-outline-primary,
+.btn-outline-primary:disabled,
+.btn-outline-primary.disabled {
+  color: var(--primary-500) !important;
+  border-color: var(--primary-500) !important;
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: var(--primary-500) !important;
+  color: #fff !important;
+  border-color: var(--primary-500) !important;
+}
+
+/* Por si usas el botón “Ver” en celeste (opcional) */
+.btn-outline-info {
+  color: #0dcaf0 !important;
+  border-color: #0dcaf0 !important;
+}
+.btn-outline-info:hover,
+.btn-outline-info:focus {
+  background: #0dcaf0 !important;
+  color: #000 !important;
+  border-color: #0dcaf0 !important;
+}
+
+/* Utilidades por si usas bg/text/border primary */
+.bg-primary { background-color: var(--primary-500) !important; }
+.border-primary { border-color: var(--primary-500) !important; }
+
+/* ===================== 7) Formularios (focus ring morado) ===================== */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: rgba(var(--primary-rgb), .55) !important;
+  box-shadow: 0 0 0 .25rem rgba(var(--primary-rgb), .25) !important;
+}
+
+/* Placeholder un poco más suave */
+::placeholder { color: #7a8591; }
+
+/* ===================== 8) Tablas (cabecera gris suave) ===================== */
+.table thead th {
+  background: var(--surface-muted);
+  color: var(--text);
+  font-weight: 600;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+.table td, .table th { vertical-align: middle; }
+
+/* ===================== 9) Tarjetas / contenedores ===================== */
+.card,
+.container .card,
+.container-fluid .card {
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,.03);
+  background: var(--surface);
+}
+
+/* Si tu caja de filtros no usa .card, descomenta:
+.filters, .filtros, .filter-box {
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0,0,0,.03);
+}
+*/
+
+/* ===================== 10) Badges (píldora + contraste) ===================== */
+.badge { border-radius: 999px; padding: .35rem .6rem; font-weight: 600; }
+.badge.bg-warning, .badge.text-bg-warning { color: #212529 !important; } /* legibilidad */
+
+/* ===================== 11) Modales ===================== */
+.modal-backdrop-custom {
+  position: fixed; inset: 0; background: rgba(0,0,0,.35);
+}
+
+/* ===================== 12) Ajustes menores ===================== */
+hr { color: var(--border); opacity: 1; }
+small, .text-muted { color: var(--muted) !important; }
