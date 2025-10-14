@@ -7,6 +7,11 @@ export default function Topbar() {
       <nav className="d-flex align-items-center gap-3">
         <Link to="/asistencias" className="text-decoration-none">Asistencias</Link>
         <a href="#" className="text-decoration-none" onClick={(e)=>e.preventDefault()}>Mi cuenta</a>
+        {/* boton para cerrar sesion */}
+        <a href="#" className="text-decoration-none" onClick={()=>{
+          localStorage.removeItem('user')
+          window.location.href = '/login'
+        }}>Cerrar sesión</a>
       </nav>
     </header>
   )
