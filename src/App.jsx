@@ -1,19 +1,51 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Layout from './layout/Layout.jsx'
-import AttendanceList from './pages/AttendanceList.jsx'
-import AttendanceCreate from './pages/AttendanceCreate.jsx'
-import AttendanceEdit from './pages/AttendanceEdit.jsx'
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/login";
+import Register from "./pages/register";
+import AttendanceList from "./pages/AttendanceList";
+import AttendanceCreate from "./pages/AttendanceCreate";
+import AttendanceEdit from "./pages/AttendanceEdit";
+import Layout from "./layout/Layout";
+
+function PrivateRoute({ children, role }) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) return <Navigate to="/login" />;
+  if (role && user.role !== role) return <Navigate to="/" />;
+  return <Layout>{children}</Layout>;
+}
 
 export default function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Navigate to="/asistencias" replace />} />
-        <Route path="/asistencias" element={<AttendanceList />} />
-        <Route path="/asistencias/nueva" element={<AttendanceCreate />} />
-        <Route path="/asistencias/:id/editar" element={<AttendanceEdit />} />
-        <Route path="*" element={<div className="p-4">No encontrada</div>} />
-      </Routes>
-    </Layout>
-  )
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route
+        path="/asistencias"
+        element={
+          <PrivateRoute>
+            <AttendanceList />
+          </PrivateRoute>
+        }
+              />
+      <Route
+        path="/asistencias/nueva"
+        element={
+          <PrivateRoute role="user">
+            <AttendanceCreate />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/asistencias/:id/editar"
+        element={
+          <PrivateRoute role="user">
+            <AttendanceEdit />
+          </PrivateRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
 }
