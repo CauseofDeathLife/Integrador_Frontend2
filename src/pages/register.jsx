@@ -1,108 +1,69 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../auth/AuthContext'
 
 export default function Register() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const { register } = useAuth()
+  const nav = useNavigate()
+  const [form, setForm] = useState({ username:'', name:'', password:'', role:'alumno' })
+  const [error, setError] = useState('')
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    if (password !== repeatPassword) {
-      setError("Las contraseñas no coinciden");
-      return;
+  const onChange = (e) => {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+  }
+
+  const onSubmit = (e) => {
+    e.preventDefault()
+    setError('')
+    try {
+      register(form)
+      alert('Usuario registrado. Ahora puedes iniciar sesión.')
+      nav('/login')
+    } catch (err) {
+      setError(err.message || 'Error al registrar')
     }
-    // Simulación de registro (puedes guardar en localStorage si lo deseas)
-    setError("");
-    navigate("/login");
-  };
+  }
 
   return (
-    <div className="container">
-      <div className="card o-hidden border-0 shadow-lg my-5">
-        <div className="card-body p-0">
-          <div className="row">
-            <div className="col-lg-5 d-none d-lg-block bg-register-image"></div>
-            <div className="col-lg-7">
-              <div className="p-5">
-                <div className="text-center">
-                  <h1 className="h4 text-gray-900 mb-4">Create an Account!</h1>
+    <div className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-7 col-lg-5">
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h2 className="h4 mb-3">Crear cuenta</h2>
+              <form onSubmit={onSubmit} className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label">Usuario *</label>
+                  <input className="form-control" name="username" value={form.username} onChange={onChange} placeholder="usuario123" />
                 </div>
-                <form className="user" onSubmit={handleRegister}>
-                  <div className="form-group row">
-                    <div className="col-sm-6 mb-3 mb-sm-0">
-                      <input
-                        type="text"
-                        className="form-control form-control-user"
-                        placeholder="First Name"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <input
-                        type="text"
-                        className="form-control form-control-user"
-                        placeholder="Last Name"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <input
-                      type="email"
-                      className="form-control form-control-user"
-                      placeholder="Email Address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="form-group row">
-                    <div className="col-sm-6 mb-3 mb-sm-0">
-                      <input
-                        type="password"
-                        className="form-control form-control-user"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <input
-                        type="password"
-                        className="form-control form-control-user"
-                        placeholder="Repeat Password"
-                        value={repeatPassword}
-                        onChange={(e) => setRepeatPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <button type="submit" className="btn btn-primary btn-user btn-block">
-                    Register Account
-                  </button>
-                  {error && <div className="alert alert-danger mt-2">{error}</div>}
-                </form>
-                <hr />
-                <div className="text-center">
-                  <a className="small" href="/login">
-                    Already have an account? Login!
-                  </a>
+                <div className="col-md-6">
+                  <label className="form-label">Nombre (opcional)</label>
+                  <input className="form-control" name="name" value={form.name} onChange={onChange} placeholder="Tu nombre" />
                 </div>
-              </div>
+                <div className="col-md-6">
+                  <label className="form-label">Contraseña *</label>
+                  <input className="form-control" type="password" name="password" value={form.password} onChange={onChange} placeholder="••••••" />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">Rol *</label>
+                  <select className="form-select" name="role" value={form.role} onChange={onChange}>
+                    <option value="maestro">Maestro</option>
+                    <option value="alumno">Alumno</option>
+                    <option value="familiar">Familiar</option>
+                  </select>
+                </div>
+                <div className="col-12 d-flex justify-content-end gap-2">
+                  <Link to="/login" className="btn btn-secondary">Cancelar</Link>
+                  <button className="btn btn-primary" type="submit">Registrar</button>
+                </div>
+                {error && <div className="col-12"><div className="alert alert-danger py-2">{error}</div></div>}
+              </form>
+              <p className="text-muted mt-3 mb-0">¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link></p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,158 +1,95 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
-const ESTUDIANTES = [
-  { id: 1, nombre: 'Alan Brito', grado: '10°' },
-  { id: 2, nombre: 'Zoyla Vaca', grado: '11°' },
-  { id: 3, nombre: 'Daniel Quintero', grado: '11°' },
-]
-
+const GRADOS = ['6°','7°','8°','9°','10°','11°']
 const ASIGNATURAS = [
-  { value: 'matematicas', label: 'Matemáticas' },
-  { value: 'lenguaje', label: 'Lenguaje' },
-  { value: 'ciencias', label: 'Ciencias' },
+  { value:'matematicas', label:'Matemáticas' },
+  { value:'lenguaje', label:'Lenguaje' },
+  { value:'ciencias', label:'Ciencias' },
 ]
 
-const BLANK = {
-  estudiante_id: '',
-  estudiante_nombre: '',
-  grado: '',
-  asignatura: '',
-  asignatura_label: '',
-  fecha: '',
-  hora: '',
-  estado: 'presente',
-  minutos_tardanza: '',
-  tipo_justificacion: '',
-  observaciones: '',
-  notificar_familia: false,
-}
+export default function AttendanceForm({ initialValue, onSubmit }) {
+  const [form, setForm] = useState(() => ({
+    estudianteNombre: '',
+    grado: GRADOS[0],
+    asignatura: ASIGNATURAS[0].value,
+    fechaISO: new Date().toISOString().slice(0,10),
+    hora: new Date().toTimeString().slice(0,5),
+    estado: 'presente',
+    observaciones: '',
+    ...initialValue
+  }))
 
-export default function AttendanceForm({ initial, onSubmit, onCancel }) {
-  const [f, setF] = useState({ ...BLANK, ...(initial||{}) })
+  const asignaturaLabel = useMemo(() => {
+    const match = ASIGNATURAS.find(a => a.value === form.asignatura)
+    return match?.label || ''
+  }, [form.asignatura])
 
-  useEffect(()=>{ setF({ ...BLANK, ...(initial||{}) }) }, [initial])
+  const onChange = (e) => {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+  }
 
-  const update = (name, value) => setF(prev => ({ ...prev, [name]: value }))
-
-  const selectedStudent = useMemo(()=> ESTUDIANTES.find(e=> String(e.id) === String(f.estudiante_id)), [f.estudiante_id])
-
-  useEffect(()=>{
-    if (selectedStudent) {
-      update('estudiante_nombre', `${selectedStudent.nombre}`)
-      update('grado', selectedStudent.grado)
-    } else {
-      update('estudiante_nombre',''); update('grado','')
-    }
-  }, [selectedStudent?.id])
-
-  const submit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    // Validación como en crear-asistencia.js
-    if (!f.estudiante_id) return alert('El campo Estudiante es obligatorio')
-    if (!f.asignatura) return alert('El campo Asignatura es obligatorio')
-    if (!f.fecha) return alert('El campo Fecha es obligatorio')
-    if (!f.hora) return alert('El campo Hora es obligatorio')
-
-    // fecha no futura
-    if (f.fecha && new Date(f.fecha) > new Date()) return alert('La fecha no puede ser futura')
-
-    // condicionales
-    if (f.estado === 'tardanza') {
-      const m = Number(f.minutos_tardanza)
-      if (!(m >= 1 && m <= 120)) return alert('Los minutos de tardanza deben estar entre 1 y 120')
-    }
-    if ((f.estado === 'ausente' || f.estado === 'justificado') && !f.tipo_justificacion) {
-      return alert('Debe seleccionar un tipo de justificación')
-    }
-
-    onSubmit(f)
+    if (!form.estudianteNombre?.trim()) { alert('Nombre del estudiante es requerido'); return }
+    const today = new Date(); today.setHours(0,0,0,0)
+    const chosen = new Date(form.fechaISO); chosen.setHours(0,0,0,0)
+    if (chosen.getTime() > today.getTime()) { alert('La fecha no puede ser futura'); return }
+    onSubmit({ ...form, asignaturaLabel })
   }
 
   return (
-    <form id="form-asistencia" onSubmit={submit} className="card">
-      <div className="card-body row g-3">
-        <div className="col-sm-6">
-          <label className="form-label" htmlFor="estudiante-select">Estudiante</label>
-          <select id="estudiante-select" className="form-control"
-            value={f.estudiante_id} onChange={e=>update('estudiante_id', e.target.value)} required>
-            <option value="">Seleccionar Estudiante</option>
-            {ESTUDIANTES.map(s => <option key={s.id} value={s.id}>{s.nombre} - {s.grado}</option>)}
+    <form onSubmit={handleSubmit}>
+      <div className="row g-3">
+        <div className="col-md-6">
+          <label className="form-label">Estudiante</label>
+          <input className="form-control" name="estudianteNombre"
+                 value={form.estudianteNombre} onChange={onChange}
+                 placeholder="Nombres y apellidos" />
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Grado</label>
+          <select className="form-select" name="grado"
+                  value={form.grado} onChange={onChange}>
+            {GRADOS.map(g => <option key={g} value={g}>{g}</option>)}
           </select>
         </div>
-        <div className="col-sm-6">
-          <label className="form-label" htmlFor="asignatura-select">Asignatura</label>
-          <select id="asignatura-select" className="form-control"
-            value={f.asignatura} onChange={e=>{ const v=e.target.value; const label = ASIGNATURAS.find(a=>a.value===v)?.label||v; update('asignatura', v); update('asignatura_label', label) }} required>
-            <option value="">Seleccionar Asignatura</option>
+        <div className="col-md-6">
+          <label className="form-label">Asignatura</label>
+          <select className="form-select" name="asignatura"
+                  value={form.asignatura} onChange={onChange}>
             {ASIGNATURAS.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}
           </select>
         </div>
-
-        <div className="col-md-6">
-          <label className="form-label" htmlFor="fecha-clase">Fecha</label>
-          <input id="fecha-clase" type="date" className="form-control" value={f.fecha} onChange={e=>update('fecha', e.target.value)} required />
+        <div className="col-md-3">
+          <label className="form-label">Fecha</label>
+          <input className="form-control" type="date" name="fechaISO"
+                 value={form.fechaISO} onChange={onChange} />
+        </div>
+        <div className="col-md-3">
+          <label className="form-label">Hora</label>
+          <input className="form-control" type="time" name="hora"
+                 value={form.hora} onChange={onChange} />
         </div>
         <div className="col-md-6">
-          <label className="form-label" htmlFor="hora-clase">Hora</label>
-          <input id="hora-clase" type="time" className="form-control" value={f.hora} onChange={e=>update('hora', e.target.value)} required />
+          <label className="form-label">Estado</label>
+          <select className="form-select" name="estado"
+                  value={form.estado} onChange={onChange}>
+            {['presente','ausente','tardanza','justificado'].map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
         </div>
-
         <div className="col-12">
-          <label className="form-label d-block">Estado</label>
-          <div className="row">
-            {['presente','ausente','tardanza','justificado'].map(opt => (
-              <div className="col-md-3 mb-3" key={opt}>
-                <div className="form-check">
-                  <input className="form-check-input" type="radio" name="estado" id={`estado-${opt}`} value={opt}
-                    checked={f.estado===opt} onChange={e=>update('estado', e.target.value)} />
-                  <label className="form-check-label" htmlFor={`estado-${opt}`}>
-                    <span className={`badge bg-${
-                      opt==='presente'?'success':opt==='ausente'?'danger':opt==='tardanza'?'warning':'info'
-                    }`}>{opt[0].toUpperCase()+opt.slice(1)}</span>
-                  </label>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {f.estado === 'tardanza' && (
-          <div id="campo-tardanza" className="form-group">
-            <label className="form-label" htmlFor="minutos-tardanza">Minutos de Tardanza</label>
-            <input id="minutos-tardanza" type="number" className="form-control" min="1" max="120"
-              value={f.minutos_tardanza} onChange={e=>update('minutos_tardanza', e.target.value)} placeholder="Ej: 15" />
-          </div>
-        )}
-
-        {(f.estado === 'ausente' || f.estado === 'justificado') && (
-          <div id="campo-justificacion" className="form-group">
-            <label className="form-label" htmlFor="tipo-justificacion">Tipo de Justificación</label>
-            <select id="tipo-justificacion" className="form-control"
-              value={f.tipo_justificacion} onChange={e=>update('tipo_justificacion', e.target.value)}>
-              <option value="">Seleccionar</option>
-              <option value="cita_medica">Cita médica</option>
-              <option value="familiar">Asunto familiar</option>
-              <option value="otro">Otro</option>
-            </select>
-          </div>
-        )}
-
-        <div className="col-12">
-          <label className="form-label" htmlFor="observaciones">Observaciones</label>
-          <textarea id="observaciones" rows="3" className="form-control" value={f.observaciones} onChange={e=>update('observaciones', e.target.value)} placeholder="Observaciones adicionales sobre la asistencia."></textarea>
-        </div>
-
-        <div className="form-group">
-          <div className="form-check">
-            <input id="notificar-familia" className="form-check-input" type="checkbox" checked={f.notificar_familia} onChange={e=>update('notificar_familia', e.target.checked)} />
-            <label className="form-check-label" htmlFor="notificar-familia">Notificar a la familia por correo electrónico</label>
-          </div>
+          <label className="form-label">Observaciones</label>
+          <textarea className="form-control" rows={3} name="observaciones"
+                    value={form.observaciones} onChange={onChange}
+                    placeholder="(opcional)"></textarea>
         </div>
       </div>
-
-      <div className="card-footer d-flex justify-content-end gap-2">
-        <button type="button" className="btn btn-outline-secondary" onClick={onCancel}>Cancelar</button>
-        <button type="submit" className="btn btn-primary">Guardar</button>
+      <div className="d-flex gap-2 justify-content-end mt-3">
+        <button type="button" className="btn btn-secondary" onClick={()=>history.back()}>
+          Cancelar
+        </button>
+        <button className="btn btn-primary" type="submit">Guardar</button>
       </div>
     </form>
   )

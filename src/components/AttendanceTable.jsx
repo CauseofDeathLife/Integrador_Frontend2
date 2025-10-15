@@ -1,41 +1,44 @@
-import StatusBadge from './StatusBadge.jsx'
+import React from 'react'
+import { Link } from 'react-router-dom'
+import StatusBadge from './StatusBadge'
 
-export default function AttendanceTable({ rows, onView, onEdit, onDelete }) {
+export default function AttendanceTable({ items, canWrite, onDelete }) {
   return (
     <div className="table-responsive">
-      <table id="table-asistencias" className="table table-hover align-middle">
-        <thead className="table-light">
+      <table className="table table-hover align-middle">
+        <thead>
           <tr>
             <th>Fecha</th>
             <th>Hora</th>
             <th>Estudiante</th>
             <th>Grado</th>
             <th>Asignatura</th>
-            <th>Docente</th>
             <th>Estado</th>
-            <th className="text-end">Acciones</th>
+            <th>Observaciones</th>
+            {canWrite && <th className="text-end">Acciones</th>}
           </tr>
         </thead>
         <tbody>
-          {rows.length === 0 && (
-            <tr><td colSpan="8" className="text-center text-muted py-4">Sin registros</td></tr>
+          {items.length === 0 && (
+            <tr><td colSpan={canWrite?8:7} className="text-muted">Sin registros</td></tr>
           )}
-          {rows.map(r => (
+          {items.map(r => (
             <tr key={r.id}>
-              <td>{r.fecha}</td>
+              <td>{r.fechaISO}</td>
               <td>{r.hora}</td>
-              <td>{r.estudiante_nombre}</td>
+              <td>{r.estudianteNombre}</td>
               <td>{r.grado}</td>
-              <td>{r.asignatura_label || r.asignatura}</td>
-              <td>{r.docente || '-'}</td>
-              <td><StatusBadge value={r.estado} /></td>
-              <td className="text-end">
-                <div className="btn-group">
-                  <button className="btn btn-sm btn-outline-info btn-view" onClick={()=>onView(r.id)}>Ver</button>
-                  <button className="btn btn-sm btn-outline-secondary btn-edit" onClick={()=>onEdit(r.id)}>Editar</button>
-                  <button className="btn btn-sm btn-outline-danger btn-delete" onClick={()=>onDelete(r.id)}>Eliminar</button>
-                </div>
-              </td>
+              <td>{r.asignaturaLabel}</td>
+              <td><StatusBadge estado={r.estado} /></td>
+              <td>{r.observaciones || '-'}</td>
+              {canWrite && (
+                <td className="text-end">
+                  <div className="btn-group">
+                    <Link className="btn btn-outline-primary btn-sm" to={`/asistencias/${r.id}/editar`}>Editar</Link>
+                    <button className="btn btn-outline-danger btn-sm" onClick={()=>onDelete(r.id)}>Eliminar</button>
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

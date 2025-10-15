@@ -1,51 +1,54 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/login";
-import Register from "./pages/register";
-import AttendanceList from "./pages/AttendanceList";
-import AttendanceCreate from "./pages/AttendanceCreate";
-import AttendanceEdit from "./pages/AttendanceEdit";
-import Layout from "./layout/Layout";
-
-function PrivateRoute({ children, role }) {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user) return <Navigate to="/login" />;
-  if (role && user.role !== role) return <Navigate to="/" />;
-  return <Layout>{children}</Layout>;
-}
+import React from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
+import AttendanceList from './pages/attendance/AttendanceList'
+import AttendanceCreate from './pages/attendance/AttendanceCreate'
+import AttendanceEdit from './pages/attendance/AttendanceEdit'
+import Layout from './components/Layout'
+import PrivateRoute from './auth/PrivateRoute'
+import RoleRoute from './auth/RoleRoute'
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      {/* Public routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      <Route
-        path="/asistencias"
-        element={
-          <PrivateRoute>
-            <AttendanceList />
-          </PrivateRoute>
-        }
-              />
-      <Route
-        path="/asistencias/nueva"
-        element={
-          <PrivateRoute role="user">
-            <AttendanceCreate />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/asistencias/:id/editar"
-        element={
-          <PrivateRoute role="user">
-            <AttendanceEdit />
-          </PrivateRoute>
-        }
-      />
+      {/* Private routes (auth required) */}
+      <Route path="/" element={
+        <PrivateRoute>
+          <Layout><Dashboard /></Layout>
+        </PrivateRoute>
+      } />
 
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="/asistencias" element={
+        <PrivateRoute>
+          <Layout><AttendanceList /></Layout>
+        </PrivateRoute>
+      } />
+
+      {/* Maestro-only for create/edit */}
+      <Route path="/asistencias/nueva" element={
+        <PrivateRoute>
+          <RoleRoute roles={['maestro']}>
+            <Layout><AttendanceCreate /></Layout>
+          </RoleRoute>
+        </PrivateRoute>
+      } />
+
+      <Route path="/asistencias/:id/editar" element={
+        <PrivateRoute>
+          <RoleRoute roles={['maestro']}>
+            <Layout><AttendanceEdit /></Layout>
+          </RoleRoute>
+        </PrivateRoute>
+      } />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  );
+  )
 }
